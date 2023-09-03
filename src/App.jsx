@@ -1,75 +1,34 @@
 import './App.css'
-import React, { useEffect, useState } from 'react';
-import jsonData from '../src/node/blyu-lok.json';
+import { BrowserRouter as Router, Route, Link, Routes, Outlet } from 'react-router-dom';
+import React from 'react';
+import { useState, useEffect } from 'react';
+import AnimePage from './AnimePage';
 
 function App() {
-  const [episodeIndex, setEpisodeIndex] = useState(0);
-  const [input, setInput] = useState(episodeIndex);
-  const [episode, setEpisode] = useState('');
-  const [id, setId] = useState('');
+  document.title = "アニメ"
+
+  const [isHidden, setIsHidden] = useState(false);
+
+  const handleLinkClick = () => {
+    setIsHidden(true);
+  }
 
   useEffect(() => {
-    const data = jsonData[episodeIndex];
-
-    setEpisode(data.episode);
-    setId(data.id);
-
-    document.title = `Blyu lock - Ep: ${data.episode}`;
-
-  }, [episodeIndex]);
-
-  const handlePreviousEpisode = () => {
-    setEpisodeIndex(prevIndex => prevIndex - 1);
-  };
-
-  const handleNextEpisode = () => {
-    setEpisodeIndex(prevIndex => prevIndex + 1);
-  };
-
-  const handleInputChange = (event) => {
-    const inputValue = parseInt(event.target.value);
-    setInput(inputValue);
-  };
-
-  const handleInputSubmit = (event) => {
-    event.preventDefault();
-    if (input >= 0 && input < jsonData.length) {
-      setEpisodeIndex(input - 1);
-    }
-  };
+    setIsHidden(false);
+  }, [location]);
 
   return (
     <>
-      <h4>
-        {document.title}
-      </h4>
-      <iframe
-        width="640"
-        height="384"
-        src={`https://video.sibnet.ru/shell.php?videoid=${id}`}
-        frameBorder="0"
-        scrolling="no"
-        allowFullScreen
-      ></iframe>
-      <p>Episode: {episode}</p>
-      <div style={{ display: 'flex', width: '640px', justifyContent: 'space-between' }}>
-        <button onClick={handlePreviousEpisode} disabled={episodeIndex === 0}>
-          Previous Episode
-        </button>
-        <form onSubmit={handleInputSubmit}>
-          <input
-            type="number"
-            value={input}
-            onChange={handleInputChange}
-            onChangeCapture={handleInputSubmit}
-            style={{ width: '100px' }}
-          />
-          <button type="submit">Go</button>
-        </form>
-        <button onClick={handleNextEpisode} disabled={episodeIndex === jsonData.length - 1}>
-          Next Episode
-        </button>
-      </div>
+      <Router>
+        {!isHidden && (
+          <Link to="/anime/0" onClick={handleLinkClick}>
+            <img src='https://desu.shikimori.me/uploads/poster/animes/49596/main-7f81a80dde5049fef4ddc7963fa4b2f4.webp' />
+          </Link>
+        )}
+        <Routes>
+          <Route path="/anime/:title_id" element={<AnimePage />} />
+        </Routes>
+      </Router> 
     </>
   );
 }
